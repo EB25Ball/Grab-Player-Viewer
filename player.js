@@ -17,7 +17,7 @@ let playerSec_Color;
 let custmoizationState = 0;
 let primaryOpened = false;//god tier naming, but this check if the primary/secondary color menu was opened
 let secondaryOpened = false;
-let cosmeticCatogories = document.getElementsByClassName("cosmeticsCatogories")
+let cosmeticCategories = document.getElementsByClassName("cosmeticsCategories")
 let shopItemsResponse = await fetch('https://api.slin.dev/grab/v1/get_shop_items?version=1');
 let shopData = await shopItemsResponse.json()
 let shopItems = []
@@ -302,22 +302,22 @@ for (let i = 0; i < categoryResponseBody.length; i++) {
 
 function createCosmeticCategories() {
 
-    if (cosmeticCatogories !== null || cosmeticCatogories !== undefined) {
+    if (cosmeticCategories !== null || cosmeticCategories !== undefined) {
         for (let i = 0; i < 6; i++) {
-            const cosmeticCatogories = document.createElement("span")
-            cosmeticCatogories.innerHTML = `${categories[i]}`
-            cosmeticCatogories.style.gridColumn = `1 / 10`
-            cosmeticCatogories.style.gridRow = `${i} / 6`
-            cosmeticCatogories.className = "cosmeticsCatogories";
-            picker.appendChild(cosmeticCatogories);
-            cosmeticCatogories.addEventListener("click", catgorySelect)
+            const cosmeticCategories = document.createElement("span")
+            cosmeticCategories.innerHTML = `${categories[i]}`
+            cosmeticCategories.style.gridColumn = `1 / 10`
+            cosmeticCategories.style.gridRow = `${i} / 6`
+            cosmeticCategories.className = "cosmeticCategories";
+            picker.appendChild(cosmeticCategories);
+            cosmeticCategories.addEventListener("click", catgorySelect)
         }
     } else {
-        for (var i = 0; i < cosmeticCatogories.length; i++) {
-            cosmeticCatogories[i].style.display = 'block';
-            cosmeticCatogories.innerHTML = `${categories[i]}`
-            cosmeticCatogories.style.gridColumn = `1 / 10`;
-            cosmeticCatogories.style.gridRow = `${i} / 6`;
+        for (var i = 0; i < cosmeticCategories.length; i++) {
+            cosmeticCategories[i].style.display = 'block';
+            cosmeticCategories.innerHTML = `${categories[i]}`
+            cosmeticCategories.style.gridColumn = `1 / 10`;
+            cosmeticCategories.style.gridRow = `${i} / 6`;
         }
     }
 }
@@ -359,8 +359,8 @@ function backClicked() {
             break;
         case 2://cosmetics catogory to menu
             custmoizationState = 0;
-            for (var i = 0; i < cosmeticCatogories.length; i++) {
-                cosmeticCatogories[i].style.display = 'none';
+            for (var i = 0; i < cosmeticCategories.length; i++) {
+                cosmeticCategories[i].style.display = 'none';
             }
             document.getElementById("back-btn").style.display = "none";
             createMenu();
@@ -375,7 +375,7 @@ function backClicked() {
 
             picker.style.display = "grid";
             createCosmeticCategories();
-            document.getElementById("stuff").style.height = "399px";
+            document.getElementById("customizations").style.height = "399px";
 
             break;
 
@@ -582,8 +582,6 @@ if(!modelFile.includes(".glb")){
                         if (node.name == 'visor') {
                             node.material.color.set(`rgb(${Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)},${Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)},${Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)})`)
                             player_model.children[0].visible = false;
-
-
                         } else {
                             if (!toggledElements.includes(modelFile)) {
                                 toggledElements.push(modelFile);
@@ -635,7 +633,7 @@ if(!modelFile.includes(".glb")){
 
 
 
-let canvaser;
+let canvas;
 
 var scenes = [], renderer1;
 
@@ -649,7 +647,7 @@ function createCosmetics(selectedCategory) {
     let OffsetScale;
     let OffsetZ;
     picker.style.display = "none";
-    document.getElementById("stuff").style.height = "100%";
+    document.getElementById("customizations").style.height = "100%";
     let categoryFiles;
     if (selectedCategory === 'Heads') {
         categoryFiles = headFiles;
@@ -686,13 +684,13 @@ function createCosmetics(selectedCategory) {
         OffsetX = 0.3;
         OffsetY = -0.65;
     }
-    canvaser = document.getElementById("c");
+    canvas = document.getElementById("canvas");
     var element2 = document.getElementById("body")
     var positionInfo = element2.getBoundingClientRect();
     var height2 = positionInfo.height;
     var width2 = positionInfo.width;
-    canvaser.style.height = height2;
-    canvaser.style.width2 = width2;
+    canvas.style.height = height2;
+    canvas.style.width2 = width2;
     var template = document.getElementById("template").text;
     var content = document.getElementById("content");
     categoryFiles.sort();
@@ -725,12 +723,15 @@ function createCosmetics(selectedCategory) {
             toggledButtonsByCategory[category].push(previewButton);
         }
         previewButton.addEventListener('click', () => {
+          
             previewButton.classList.toggle('toggled');
 
             if (previewButton.classList.contains('toggled')) {
                 previewButton.innerHTML = 'Un-equip';
                 previewButton.style.backgroundColor = "#FF0000";
-
+                if (selectedCategory==='Heads'){
+                    player_model.children[0].visible = true;
+                }
                 loader.load(categoryFiles[i].replace(/(_primary).*$/i, ".glb"), function (gltf) {
                     model = gltf.scene;
                     model.name = categoryFiles[i];
@@ -914,13 +915,13 @@ if (match) {
         scenes.push(scene1);
     }
 
-    renderer1 = new THREE.WebGLRenderer({ canvas: canvaser, alpha: true, transparent: true, antialias: true });
+    renderer1 = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, transparent: true, antialias: true });
     renderer1.setPixelRatio(window.devicePixelRatio);
 }
 function updateSize() {
-    var width = canvaser.clientWidth;
-    var height = canvaser.clientHeight;
-    if (canvaser.width !== width || canvaser.height != height) {
+    var width = canvas.clientWidth;
+    var height = canvas.clientHeight;
+    if (canvas.width !== width || canvas.height != height) {
         renderer1.setSize(width, height, false);
     }
 }

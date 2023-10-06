@@ -31,33 +31,31 @@ let checkpointsFiles = []
 
 
 for (var item in shopData) {
-    
+
     const cosmeticItem = shopData[item];
-    if(cosmeticItem.file.includes('cosmetics/head/hat/')){
-hatFiles.push(cosmeticItem.file+'.glb')
+    if (cosmeticItem.file.includes('cosmetics/head/hat/')) {
+        hatFiles.push(cosmeticItem.file + '.glb')
     }
-    if(cosmeticItem.file.includes('cosmetics/head/glasses/')){
-        FacewearFiles.push(cosmeticItem.file+'.glb')
+    if (cosmeticItem.file.includes('cosmetics/head/glasses/')) {
+        FacewearFiles.push(cosmeticItem.file + '.glb')
     }
-    if(cosmeticItem.file.includes('cosmetics/head/head/')){
-        headFiles.push(cosmeticItem.file+'.glb')
+    if (cosmeticItem.file.includes('cosmetics/head/head/')) {
+        headFiles.push(cosmeticItem.file + '.glb')
     }
-    if(cosmeticItem.file.includes('cosmetics/hand/')){
-        handFiles.push(cosmeticItem.file+'.glb')
-        console.log(handFiles);
+    if (cosmeticItem.file.includes('cosmetics/hand/')) {
+        handFiles.push(cosmeticItem.file + '.glb')
     }
-    if(cosmeticItem.file.includes('cosmetics/grapple/')){
-        grappleFiles.push(cosmeticItem.file+'.glb')
+    if (cosmeticItem.file.includes('cosmetics/grapple/hook/')) {
+        grappleFiles.push(cosmeticItem.file + '.glb')
     }
-    if(cosmeticItem.file.includes('cosmetics/checkpoint/')){
-        checkpointsFiles.push(cosmeticItem.file+'.glb')
+    if (cosmeticItem.file.includes('cosmetics/checkpoint/')) {
+        checkpointsFiles.push(cosmeticItem.file + '.glb')
     }
     if (cosmeticItem.colors !== undefined) {
         let isInShopItems = shopItems.includes(cosmeticItem.file);
         for (const cosmeticArray of [checkpointsFiles, headFiles, handFiles, grappleFiles, hatFiles, FacewearFiles]) {
             if (cosmeticArray.includes(cosmeticItem.file + '.glb')) {
-                shopItems.push(cosmeticItem.file+'.glb')
-                console.log(cosmeticItem.file);
+                shopItems.push(cosmeticItem.file + '.glb')
                 if (cosmeticItem.colors[0] && cosmeticItem.colors[1] === undefined) {
                     cosmeticArray.push(`${cosmeticItem.file}_primary_${cosmeticItem.colors[0][0]}_${[cosmeticItem.colors[0][1]]}_${cosmeticItem.colors[0][2]}_secondary.glb`)
                 }
@@ -65,16 +63,15 @@ hatFiles.push(cosmeticItem.file+'.glb')
                     cosmeticArray.push(`${cosmeticItem.file}_primary_${cosmeticItem.colors[0][0]}_${[cosmeticItem.colors[0][1]]}_${cosmeticItem.colors[0][2]}_secondary_${cosmeticItem.colors[1][0]}_${[cosmeticItem.colors[1][1]]}_${cosmeticItem.colors[1][2]}.glb`)
                 }
             }
-            
+
         }
     }
-    for (const cosmeticArray of [checkpointsFiles, headFiles, handFiles, grappleFiles, hatFiles, FacewearFiles]) 
-{
-    const filteredCosmeticArray = cosmeticArray.filter(item => !shopItems.includes(item));
+    for (const cosmeticArray of [checkpointsFiles, headFiles, handFiles, grappleFiles, hatFiles, FacewearFiles]) {
+        const filteredCosmeticArray = cosmeticArray.filter(item => !shopItems.includes(item));
 
-    cosmeticArray.length = 0;
-    cosmeticArray.push(...filteredCosmeticArray);
-}
+        cosmeticArray.length = 0;
+        cosmeticArray.push(...filteredCosmeticArray);
+    }
 }
 
 
@@ -473,8 +470,7 @@ async function SetColors() {
                             if (correspondingItem.colors[0] && correspondingItem.colors[1] !== undefined) {
                                 eval(`${key} = ${key}+'_primary_${correspondingItem.colors[0][0]}_${correspondingItem.colors[0][1]}_${correspondingItem.colors[0][2]}_secondary_${correspondingItem.colors[1][0]}_${correspondingItem.colors[1][1]}_${correspondingItem.colors[1][2]}.glb'`)
                             }
-                            console.log(key)
-                            console.log(playerHat)
+
 
                         }
                     }
@@ -514,15 +510,15 @@ async function SetColors() {
             }
             if (playerFaceWear !== undefined) {
                 OffsetY = player_model.children[0].position.y + 0.2;
-                if(playerFaceWear=='cosmetics/head/glasses/glasses_nerd'){
-                    OffsetZ=player_model.children[0].position.z + 0.035;
+                if (playerFaceWear == 'cosmetics/head/glasses/glasses_nerd') {
+                    OffsetZ = player_model.children[0].position.z + 0.035;
                     cosmeticsOnLoad(playerFaceWear.replace("head_glasses_", "cosmetics/head/glasses/") + ".glb", undefined/*offsetrotx*/, undefined/*OffsetRoty*/, undefined/*OffsetRotz*/, undefined/*OffsetScale*/, -undefined/*OffsetX*/, OffsetY/*OffsetY*/, OffsetZ/*OffsetRotz*/)
 
-                }else{
+                } else {
                     cosmeticsOnLoad(playerFaceWear.replace("head_glasses_", "cosmetics/head/glasses/") + ".glb", undefined/*offsetrotx*/, undefined/*OffsetRoty*/, undefined/*OffsetRotz*/, undefined/*OffsetScale*/, -undefined/*OffsetX*/, OffsetY/*OffsetY*/, undefined/*OffsetRotz*/)
 
                 }
-                
+
                 if (!toggledElements.includes(playerFaceWear.replace("head_", "cosmetics/head/glasses/") + ".glb")) {
                     toggledElements.push(playerFaceWear.replace("head_", "cosmetics/head/glasses/") + ".glb");
                 }
@@ -536,10 +532,9 @@ async function SetColors() {
                 }
             }
             function cosmeticsOnLoad(modelFile, OffsetRotx, OffsetRoty, OffsetRotz, OffsetScale, OffsetX, OffsetY, OffsetZ) {
-console.log(modelFile);
-if(!modelFile.includes(".glb")){
-    modelFile= modelFile+'.glb';
-}
+                if (!modelFile.includes(".glb")) {
+                    modelFile = modelFile + '.glb';
+                }
                 loader.load(modelFile.replace(/(_primary).*$/i, ".glb"), (model) => {
                     if (OffsetX) model.scene.position.x = OffsetX;
                     if (OffsetY) model.scene.position.y = OffsetY;
@@ -558,24 +553,24 @@ if(!modelFile.includes(".glb")){
                             const regex2 = /secondary_([\d._]+).glb/;
                             const match2 = modelFile.match(regex2);
                             const match = modelFile.match(regex);
-                            
+
                             if (match2) {
                                 const num = match2[1].split('_').map(Number);
                                 const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
                                 const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
                                 const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
-                                if(x==1){
+                                if (x == 1) {
                                     node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
-                                  }
-                              }
+                                }
+                            }
                             if (match) {
-                              const num = match[1].split('_').map(Number);
-                              const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
-                              const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
-                              const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
-                              if(x==0){
-                                node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
-                              }x++
+                                const num = match[1].split('_').map(Number);
+                                const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
+                                const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
+                                const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
+                                if (x == 0) {
+                                    node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
+                                } x++
                             }
                         }
                         if (node.name == 'visor') {
@@ -693,17 +688,38 @@ function createCosmetics(selectedCategory) {
     var template = document.getElementById("template").text;
     var content = document.getElementById("content");
     categoryFiles.sort();
+    let test = []
     for (let i = 0; i < categoryFiles.length; i++) {
         var loader1 = new GLTFLoader();
         var scene1 = new THREE.Scene();
         var element = document.createElement("div");
         element.id = `${categoryFiles[i]}`
         element.className = "list-item";
-        const withoutUnderscore = categoryFiles[i].replace(/_/g, ' ');
-        const withoutExtension = withoutUnderscore.replace(/\.glb$/, '');
-        const file2name = withoutExtension.replace('cosmetics/', '').replace('basic', '').replace('head/', '').replace('hat/', '').replace('grapple/', '').replace('checkpoint/', '').replace('head/', '').replace('hand/', '').replace('glasses/', '').replace('primary','').replace('secondary','').replace(/\d/g, '').replace(/\./g, '');
-        element.innerHTML = template.replace('Scene $', `${file2name}`);
+        for (var item in shopData) {
+            console.log(categoryFiles[i].replace(/(_primary).*$/i, "").replace(".glb",""))
+             if (categoryFiles[i].replace(/(_primary).*$/i, "").replace(".glb","") === shopData[item].file) {
+                if(shopData[item].colors == undefined){
+                    element.innerHTML = template.replace('Scene $', `${shopData[item].title}`);
+                }
+                if (shopData[item].colors){
+                    if(shopData[item].colors[1] ==undefined){
+                    if(categoryFiles[i].includes(shopData[item].colors[0][0])&&categoryFiles[i].includes(shopData[item].colors[0][1])&&categoryFiles[i].includes(shopData[item].colors[0][2])&&!test.includes(categoryFiles[i])){
+                        element.innerHTML = template.replace('Scene $', `${shopData[item].title}`);
+                        test.push(categoryFiles[i]);
 
+                    }} 
+                    if (shopData[item].colors[1] !==undefined){
+                        if(categoryFiles[i].includes(shopData[item].colors[0][0])&&categoryFiles[i].includes(shopData[item].colors[0][1])&&categoryFiles[i].includes(shopData[item].colors[0][2]) &&categoryFiles[i].includes(shopData[item].colors[1][0])&&categoryFiles[i].includes(shopData[item].colors[1][1])&&categoryFiles[i].includes(shopData[item].colors[1][2])&&!test.includes(categoryFiles[i])){
+                            element.innerHTML = template.replace('Scene $', `${shopData[item].title}`);
+                            test.push(categoryFiles[i]);
+                        }
+                    }
+
+                }
+                }
+        
+        
+        }
 
         const previewButton = document.createElement('button');
         previewButton.style.height = '2em';
@@ -722,13 +738,13 @@ function createCosmetics(selectedCategory) {
             toggledButtonsByCategory[category].push(previewButton);
         }
         previewButton.addEventListener('click', () => {
-          
+
             previewButton.classList.toggle('toggled');
 
             if (previewButton.classList.contains('toggled')) {
                 previewButton.innerHTML = 'Un-equip';
                 previewButton.style.backgroundColor = "#FF0000";
-                if (selectedCategory==='Heads'){
+                if (selectedCategory === 'Heads') {
                     player_model.children[0].visible = true;
                 }
                 loader.load(categoryFiles[i].replace(/(_primary).*$/i, ".glb"), function (gltf) {
@@ -741,10 +757,10 @@ function createCosmetics(selectedCategory) {
                     if (OffsetRoty) model.rotation.y = OffsetRoty;
                     if (OffsetRotx) model.rotation.x = OffsetRotx;
                     if (OffsetRotz) model.rotation.z = OffsetRotz;
-                    if(categoryFiles[i]=='cosmetics/head/glasses/glasses_nerd.glb'){
-                        model.position.z=0.035;
+                    if (categoryFiles[i] == 'cosmetics/head/glasses/glasses_nerd.glb') {
+                        model.position.z = 0.035;
                     }
-                    
+
                     scene.add(model); if (selectedCategory === "Hands") {
                         const clonedModel = model.clone();
                         clonedModel.name = model.name;
@@ -760,24 +776,24 @@ function createCosmetics(selectedCategory) {
                             const regex2 = /secondary_([\d._]+).glb/;
                             const match2 = categoryFiles[i].match(regex2);
                             const match = categoryFiles[i].match(regex);
-                            
+
                             if (match2) {
                                 const num = match2[1].split('_').map(Number);
                                 const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
                                 const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
                                 const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
-                                if(x==1){
+                                if (x == 1) {
                                     node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
-                                  }
-                              }
+                                }
+                            }
                             if (match) {
-                              const num = match[1].split('_').map(Number);
-                              const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
-                              const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
-                              const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
-                              if(x==0){
-                                node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
-                              }x++
+                                const num = match[1].split('_').map(Number);
+                                const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
+                                const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
+                                const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
+                                if (x == 0) {
+                                    node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
+                                } x++
                             }
                         }
                         if (node.name == 'visor') {
@@ -877,29 +893,29 @@ function createCosmetics(selectedCategory) {
 
 
                     if (node.material !== undefined) {
-const regex = /primary_([\d._]+)_secondary/;
-const regex2 = /secondary_([\d._]+).glb/;
-const match2 = categoryFiles[i].match(regex2);
-const match = categoryFiles[i].match(regex);
+                        const regex = /primary_([\d._]+)_secondary/;
+                        const regex2 = /secondary_([\d._]+).glb/;
+                        const match2 = categoryFiles[i].match(regex2);
+                        const match = categoryFiles[i].match(regex);
 
-if (match2) {
-    const num = match2[1].split('_').map(Number);
-    const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
-    const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
-    const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
-    if(x==1){
-        node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
-      }
-  }
-if (match) {
-  const num = match[1].split('_').map(Number);
-  const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
-  const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
-  const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
-  if(x==0){
-    node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
-  }x++
-}
+                        if (match2) {
+                            const num = match2[1].split('_').map(Number);
+                            const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
+                            const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
+                            const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
+                            if (x == 1) {
+                                node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
+                            }
+                        }
+                        if (match) {
+                            const num = match[1].split('_').map(Number);
+                            const hexNum1 = parseInt(num[0] * 255).toString(16).padStart(2, '0');
+                            const hexNum2 = parseInt(num[1] * 255).toString(16).padStart(2, '0');
+                            const hexNum3 = parseInt(num[2] * 255).toString(16).padStart(2, '0');
+                            if (x == 0) {
+                                node.material.color.set(`#${hexNum1}${hexNum2}${hexNum3}`)
+                            } x++
+                        }
 
                     }
                 });

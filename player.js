@@ -23,7 +23,7 @@ let headFiles = [
     "cosmetics/head/head/space_basic.glb"
 ]
 
-let handFiles = ["cosmetics/hands/handshand_claw.glb",
+let handFiles = ["cosmetics/hands/hand_claw.glb",
     "cosmetics/hands/sphere_basic.glb"]
 let hatFiles = [
     "cosmetics/head/hat/baseballcap_propeller.glb",

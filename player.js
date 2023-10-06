@@ -21,7 +21,7 @@ let cosmeticCategories = document.getElementsByClassName("cosmeticsCategories")
 let shopItemsResponse = await fetch('https://api.slin.dev/grab/v1/get_shop_items?version=1');
 let shopData = await shopItemsResponse.json()
 let shopItems = []
-let headFiles = []
+let headFiles = ["cosmetics/head/head.glb"]
 
 let handFiles = ["cosmetics/hand/hand_claw.glb"]
 let hatFiles = []
@@ -72,8 +72,7 @@ hatFiles.push(cosmeticItem.file+'.glb')
 {
     const filteredCosmeticArray = cosmeticArray.filter(item => !shopItems.includes(item));
 
-    // Assign the filtered array back to the original cosmeticArray
-    cosmeticArray.length = 0; // Clear the original array
+    cosmeticArray.length = 0;
     cosmeticArray.push(...filteredCosmeticArray);
 }
 }

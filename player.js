@@ -7,7 +7,8 @@ const userId = urlParams.get('user_id');
 const picker = document.getElementById('color-picker');
 const playerInfo_Url = `https://api.slin.dev/grab/v1/get_user_info?user_id=${userId}`;//edit this later to use the config https://api.slin.dev/grab/v1/ and then just call it with fetch(configname_here + 'get_user_info?' + `user_id=${userId}`)
 const shopCatalog = `https://api.slin.dev/grab/v1/get_shop_catalog?version=1`;//edit this later to use the config https://api.slin.dev/grab/v1/ and then just call it with fetch(configname_here + 'get_user_info?' + `user_id=${userId}`)
-
+let categoryResponse = await fetch(shopCatalog);
+let categoryResponseBody = await categoryResponse.json();
 let player_model;
 let activePrim_Div;
 let activeSec_Div;
@@ -17,98 +18,65 @@ let custmoizationState = 0;
 let primaryOpened = false;//god tier naming, but this check if the primary/secondary color menu was opened
 let secondaryOpened = false;
 let cosmeticCatogories = document.getElementsByClassName("cosmeticsCatogories")
-let headFiles = [
-    "cosmetics/head/head/diver_oldschool.glb",
-    "cosmetics/head/head/head.glb",
-    "cosmetics/head/head/space_basic.glb"
-]
+let shopItemsResponse = await fetch('https://api.slin.dev/grab/v1/get_shop_items?version=1');
+let shopData = await shopItemsResponse.json()
+let shopItems = []
+let headFiles = []
 
-let handFiles = ["cosmetics/hands/hand_claw.glb",
-    "cosmetics/hands/sphere_basic.glb"]
-let hatFiles = [
-    "cosmetics/head/hat/baseballcap_propeller.glb",
-    "cosmetics/head/hat/baseballcap_basic.glb",
-    "cosmetics/head/hat/halo_angel_basic.glb",
-    "cosmetics/head/hat/bunnyears_basic.glb",
-    "cosmetics/head/hat/catears_piercing.glb",
-    "cosmetics/head/hat/cheese_basic.glb",
-    "cosmetics/head/hat/christmas_basic.glb",
-    "cosmetics/head/hat/contest_build_tutorial.glb",
-    "cosmetics/head/hat/cowboyhat_basic_dev.glb",
-    "cosmetics/head/hat/crown_royal.glb",
-    "cosmetics/head/hat/fedora_easter_2023.glb",
-    "cosmetics/head/hat/headband_basic.glb",
-    "cosmetics/head/hat/ninjahat_basic.glb",
-    "cosmetics/head/hat/sunhat_basic_moderator.glb",
-    "cosmetics/head/hat/tophat_basic.glb",
-    "cosmetics/head/hat/tophat_heart.glb",
-    "cosmetics/head/hat/tree_christmas_2022.glb",
-    "cosmetics/head/hat/umbrellahat_basic.glb",
-    "cosmetics/head/hat/witchhat_basic.glb"
-]
-
-let FacewearFiles = [
-    "cosmetics/head/glasses/beard_christmas_2022.glb",
-    "cosmetics/head/glasses/horns_devil_basic.glb",
-    "cosmetics/head/glasses/mask_dragon_paper.glb",
-    "cosmetics/head/glasses/mask_oni_basic.glb",
-    "cosmetics/head/glasses/glasses_nerd.glb",
-    "cosmetics/head/glasses/hmd_meta_basic.glb"
-]
-
-let grappleFiles = [
-    "cosmetics/grapple/arrow_heart.glb",
-    "cosmetics/grapple/candycane_2022.glb",
-    "cosmetics/grapple/carrot_basic.glb",
-    "cosmetics/grapple/cheese_string.glb",
-    "cosmetics/grapple/easter_2023.glb",
-    "cosmetics/grapple/fish_rizzler.glb",
-    "cosmetics/grapple/foldingfan_basic.glb",
-    "cosmetics/grapple/hotdog.glb",
-    "cosmetics/grapple/kunai_basic.glb",
-    "cosmetics/grapple/pen_marker.glb",
-    "cosmetics/grapple/rocket_basic.glb",
-    "cosmetics/grapple/shark_basic.glb",
-    "cosmetics/grapple/shovel_basic.glb",
-    "cosmetics/grapple/shoge_basic.glb",
-    "cosmetics/grapple/spear_angel.glb",
-    "cosmetics/grapple/spider_basic.glb",
-    "cosmetics/grapple/stake_basic_wood.glb",
-    "cosmetics/grapple/sword_royal.glb",
-    "cosmetics/grapple/trident_basic_gold.glb",
-    "cosmetics/grapple/trident_devil.glb"
-]
-
-let checkpointsFiles = [
-    "cosmetics/checkpoint/backpack_school.glb",
-    "cosmetics/checkpoint/balloon_heart.glb",
-    "cosmetics/checkpoint/chair_folding.glb",
-    "cosmetics/checkpoint/checkpoint.glb",
-    "cosmetics/checkpoint/cheesepoint.glb",
-    "cosmetics/checkpoint/egg_basic_easter.glb",
-    "cosmetics/checkpoint/flag_basic.glb",
-    "cosmetics/checkpoint/fox_inu.glb",
-    "cosmetics/checkpoint/gate_angel.glb",
-    "cosmetics/checkpoint/katana_basic.glb",
-    "cosmetics/checkpoint/kite_basic.glb",
-    "cosmetics/checkpoint/lantern_chinese.glb",
-    "cosmetics/checkpoint/lifebuoy_flag_basic.glb",
-    "cosmetics/checkpoint/mini_me.glb",
-    "cosmetics/checkpoint/the_mountain.glb",
-    "cosmetics/checkpoint/ninjabanner_basic.glb",
-    "cosmetics/checkpoint/northpole_2022.glb",
-    "cosmetics/checkpoint/orb_basic_pulsating.glb",
-    "cosmetics/checkpoint/pentagram_devil.glb",
-    "cosmetics/checkpoint/pumpkin_basic.glb",
-    "cosmetics/checkpoint/scepter_royal.glb",
-    "cosmetics/checkpoint/scubatanks.glb",
-    "cosmetics/checkpoint/sir_duckton.glb",
-    "cosmetics/checkpoint/snowman_2022_cc.glb",
-    "cosmetics/checkpoint/ufo_basic_beam.glb"
-]
+let handFiles = ["cosmetics/hand/hand_claw.glb"]
+let hatFiles = []
+let FacewearFiles = []
+let grappleFiles = []
+let checkpointsFiles = []
 
 
+for (var item in shopData) {
+    
+    const cosmeticItem = shopData[item];
+    if(cosmeticItem.file.includes('cosmetics/head/hat/')){
+hatFiles.push(cosmeticItem.file+'.glb')
+    }
+    if(cosmeticItem.file.includes('cosmetics/head/glasses/')){
+        FacewearFiles.push(cosmeticItem.file+'.glb')
+    }
+    if(cosmeticItem.file.includes('cosmetics/head/head/')){
+        headFiles.push(cosmeticItem.file+'.glb')
+    }
+    if(cosmeticItem.file.includes('cosmetics/hand/')){
+        handFiles.push(cosmeticItem.file+'.glb')
+        console.log(handFiles);
+    }
+    if(cosmeticItem.file.includes('cosmetics/grapple/')){
+        grappleFiles.push(cosmeticItem.file+'.glb')
+    }
+    if(cosmeticItem.file.includes('cosmetics/checkpoint/')){
+        checkpointsFiles.push(cosmeticItem.file+'.glb')
+    }
+    if (cosmeticItem.colors !== undefined) {
+        let isInShopItems = shopItems.includes(cosmeticItem.file);
+        for (const cosmeticArray of [checkpointsFiles, headFiles, handFiles, grappleFiles, hatFiles, FacewearFiles]) {
+            if (cosmeticArray.includes(cosmeticItem.file + '.glb')) {
+                shopItems.push(cosmeticItem.file+'.glb')
+                console.log(cosmeticItem.file);
+                if (cosmeticItem.colors[0] && cosmeticItem.colors[1] === undefined) {
+                    cosmeticArray.push(`${cosmeticItem.file}_primary_${cosmeticItem.colors[0][0]}_${[cosmeticItem.colors[0][1]]}_${cosmeticItem.colors[0][2]}_secondary.glb`)
+                }
+                else if (cosmeticItem.colors[0] && cosmeticItem.colors[1]) {
+                    cosmeticArray.push(`${cosmeticItem.file}_primary_${cosmeticItem.colors[0][0]}_${[cosmeticItem.colors[0][1]]}_${cosmeticItem.colors[0][2]}_secondary_${cosmeticItem.colors[1][0]}_${[cosmeticItem.colors[1][1]]}_${cosmeticItem.colors[1][2]}.glb`)
+                }
+            }
+            
+        }
+    }
+    for (const cosmeticArray of [checkpointsFiles, headFiles, handFiles, grappleFiles, hatFiles, FacewearFiles]) 
+{
+    const filteredCosmeticArray = cosmeticArray.filter(item => !shopItems.includes(item));
 
+    // Assign the filtered array back to the original cosmeticArray
+    cosmeticArray.length = 0; // Clear the original array
+    cosmeticArray.push(...filteredCosmeticArray);
+}
+}
 
 
 
@@ -320,8 +288,6 @@ addEventListener('click', (e) => {
 });
 
 let categories = [];
-let categoryResponse = await fetch(shopCatalog);
-let categoryResponseBody = await categoryResponse.json();
 
 for (let i = 0; i < categoryResponseBody.length; i++) {
     if (
@@ -366,7 +332,6 @@ function catgorySelect() {
             }
         });
     }
-    checkShopItems();
     createCosmetics(selectedCategory);
     animates();
 }
@@ -416,44 +381,6 @@ function backClicked() {
 
     }
 }
-let shopItemsResponse = await fetch('https://api.slin.dev/grab/v1/get_shop_items?version=1');
-let shopData = await shopItemsResponse.json()
-let shopItems = []
-function checkShopItems() {
-
-    for (var item in shopData) {
-        if (shopData.hasOwnProperty(item)) {
-            const cosmeticItem = shopData[item];
-            if (cosmeticItem.colors !== undefined) {
-                let isInShopItems = shopItems.includes(cosmeticItem.file);
-                for (const cosmeticArray of [checkpointsFiles, headFiles, handFiles, grappleFiles, hatFiles, FacewearFiles]) {
-                    if (cosmeticArray.includes(cosmeticItem.file + '.glb')) {
-                        shopItems.push(cosmeticItem.file+'.glb')
-                        console.log(cosmeticItem.file);
-                        if (cosmeticItem.colors[0] && cosmeticItem.colors[1] === undefined) {
-                            cosmeticArray.push(`${cosmeticItem.file}_primary_${cosmeticItem.colors[0][0]}_${[cosmeticItem.colors[0][1]]}_${cosmeticItem.colors[0][2]}_secondary.glb`)
-                        }
-                        else if (cosmeticItem.colors[0] && cosmeticItem.colors[1]) {
-                            cosmeticArray.push(`${cosmeticItem.file}_primary_${cosmeticItem.colors[0][0]}_${[cosmeticItem.colors[0][1]]}_${cosmeticItem.colors[0][2]}_secondary_${cosmeticItem.colors[1][0]}_${[cosmeticItem.colors[1][1]]}_${cosmeticItem.colors[1][2]}.glb`)
-                        }
-                    }
-                    
-                }
-
-            }
-        }
-    }
-    for (const cosmeticArray of [checkpointsFiles, headFiles, handFiles, grappleFiles, hatFiles, FacewearFiles]) 
-{
-    const filteredCosmeticArray = cosmeticArray.filter(item => !shopItems.includes(item));
-
-    // Assign the filtered array back to the original cosmeticArray
-    cosmeticArray.length = 0; // Clear the original array
-    cosmeticArray.push(...filteredCosmeticArray);
-}
-
-}
-
 
 const scene = new THREE.Scene();
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);

@@ -377,7 +377,7 @@ renderer.setSize(400, 450);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableZoom = true;
-controls.enablePan = true;
+controls.enablePan = false;
 controls.minPolarAngle = Math.PI / 2;
 controls.maxPolarAngle = Math.PI / 2;
 controls.addEventListener('start', () => {
@@ -680,7 +680,7 @@ function createCosmetics(selectedCategory) {
                 previewButton.innerHTML = 'Un-equip';
                 previewButton.style.backgroundColor = "#FF0000";
                 if (selectedCategory === 'Heads') {
-                    player_model.children[0].visible = true;
+                    player_model.children[0].visible = false;
                 }//hhhhhhhhhhhhhhhhhhhhhh
                 loader.load(categoryFiles[cosItem].file, function (gltf) {
                     model = gltf.scene;
@@ -721,8 +721,9 @@ function createCosmetics(selectedCategory) {
                             }
                             if (categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor") !== -1) {
                                 if (x == 1+categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {                            
+                                    if(playerSec_Color){
                                     node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);
-                                    player_model.children[0].visible=false;
+                                     } player_model.children[0].visible=false;
     
                                 }
                             }
@@ -755,13 +756,14 @@ function createCosmetics(selectedCategory) {
                 loadedModel.forEach(obj => {
                     scene.remove(obj);
                 });
-                if (selectedCategory == 'Heads') {
-                    const allUntoggled = toggledButtonsByCategory[category].every(button => !button.classList.contains('toggled'));
-                    if (allUntoggled) {
-                        player_model.children[0].visible = true;
-                    }
+            }
+            if (selectedCategory == 'Heads') {
+                const allUntoggled = toggledButtonsByCategory[category].every(button => !button.classList.contains('toggled'));
+                console.log("raggshkda");
+                console.log(allUntoggled);
+                if (allUntoggled) {
+                   // player_model.children[0].visible = true;
                 }
-
             }
 
             toggledButtonsByCategory[category] = toggledButtonsByCategory[category].filter(otherButton => {
@@ -834,9 +836,10 @@ function createCosmetics(selectedCategory) {
                             }
                         }
                         if (categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor") !== -1) {
-                            if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {                            
-                                node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);
-                                player_model.children[0].visible=false;
+                            if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {  
+                                if(playerSec_Color){
+                                node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);    
+                            }
 
                             }
                         }

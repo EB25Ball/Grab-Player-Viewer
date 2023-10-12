@@ -377,7 +377,7 @@ renderer.setSize(400, 450);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableZoom = true;
-controls.enablePan = false;
+controls.enablePan = true;
 controls.minPolarAngle = Math.PI / 2;
 controls.maxPolarAngle = Math.PI / 2;
 controls.addEventListener('start', () => {
@@ -527,9 +527,11 @@ async function SetColors() {
                                             node.material.color.set(`#${ Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
                                         }
                                     }
-                                    if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secColor){
-                                        node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
-                                    }
+                                    if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secondaryColor){
+                                        if(x==1){
+                                         node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                                     }
+                                 }
                                     
                                     x++;
                                 }
@@ -732,7 +734,7 @@ function createCosmetics(selectedCategory) {
                                     node.material.color.set(`#${ Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
                                 }
                             }
-                            if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secColor){
+                            if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secondaryColor){
                                if(x==2){
                                 node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
                             }}
@@ -849,12 +851,14 @@ function createCosmetics(selectedCategory) {
                                 node.material.color.set(`#${ Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
                             }
                         }
-                        if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secColor){
-                            node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
-                        }
-                        
+                        if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secondaryColor){
+                            if(x==1){
+                             node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                         }
+                     }            
                         x++;
                     }
+            
                 });
 
                 scene1.add(gltf.scene);

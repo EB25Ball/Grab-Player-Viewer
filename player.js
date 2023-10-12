@@ -377,7 +377,7 @@ renderer.setSize(400, 450);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableZoom = true;
-controls.enablePan = false;
+controls.enablePan = true;
 controls.minPolarAngle = Math.PI / 2;
 controls.maxPolarAngle = Math.PI / 2;
 controls.addEventListener('start', () => {

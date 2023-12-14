@@ -14,6 +14,8 @@ let activePrim_Div;
 let activeSec_Div;
 let playerPrim_Color;
 let playerSec_Color;
+let head;
+let headFile;
 let custmoizationState = 0;
 let primaryOpened = false;//god tier naming, but this check if the primary/secondary color menu was opened
 let secondaryOpened = false;
@@ -24,9 +26,10 @@ let shopItems = []
 let visorColor;
 let files = {}
 for (var item1 in categoryResponseBody) {
+   
     if (categoryResponseBody[item1].title !== 'Item Packs' &&
         categoryResponseBody[item1].title !== 'Change Detail Color' &&
-        categoryResponseBody[item1].title !== 'Change Main Color') {
+        categoryResponseBody[item1].title !== 'Change Main Color'&& categoryResponseBody[item1].title !== 'Head'&&categoryResponseBody[item1].title !== 'Heads') {
         let title = categoryResponseBody[item1].title
         files[title] = {}
         for (var i = 0; i < categoryResponseBody[item1].items.length; i++) {
@@ -35,26 +38,29 @@ for (var item1 in categoryResponseBody) {
                 const cosmeticItem = shopData[item];
                 if (item === itemName) {
                     let materialList = []
+                    let preview_rotation = cosmeticItem.preview_rotation;
                     for (var e in cosmeticItem.materials_v2) {
                         if (cosmeticItem.materials_v2[e].type) {
                             materialList.push(cosmeticItem.materials_v2[e].type)
                         } else {
                             materialList.push(cosmeticItem.materials_v2[e])
                         }
-                    } 
+                    }
                     files[title][itemName] = {
                         file: cosmeticItem.file + '.glb',
                         name: cosmeticItem.title,
                         primaryColor: cosmeticItem.colors ? cosmeticItem.colors[0] : undefined,
                         secondaryColor: cosmeticItem.colors ? (cosmeticItem.colors[1] ? cosmeticItem.colors[1] : undefined) : undefined,
-                        materials: materialList
+                        materials: materialList,
+                        previewRotation: preview_rotation
                     }
                 }
             }
         }
     }
+   
 }
-
+console.log(files);
 
 
 
@@ -177,6 +183,28 @@ function setPrimaryColor(e) {
                 }
             });
         }
+        if (head) {
+            let x = 0;
+            let categoryFiles = files['Heads'];
+            console.log(categoryFiles)
+            for (var cosItem in categoryFiles) {
+                console.log(headFile + " e " + categoryFiles[cosItem].file)
+                if (categoryFiles[cosItem].file == headFile) {
+                    head.traverse(function (node) {
+                        if (node.name !== "Scene" && node.material !== undefined) {
+                            if (categoryFiles[cosItem].materials.indexOf("default_primary_color") !== -1 && categoryFiles[cosItem].primaryColor == undefined) {
+                                if (x == categoryFiles[cosItem].materials.indexOf("default_primary_color")) {
+                                    node.material.color.set(primColor);
+                                    console.log(x);
+                                }
+                            }
+                            x++;
+                        }
+
+                    })
+                }
+            }
+        }
     }
     renderer.render(scene, camera);
     createMenu();
@@ -210,6 +238,32 @@ function setSecondaryColor(e) {
                     //darkened visor color fyi, this is correct darkenment
                 }
             });
+        }
+        if (head) {
+            let x = 0;
+            let categoryFiles = files['Heads'];
+            console.log(categoryFiles)
+            for (var cosItem in categoryFiles) {
+                console.log(headFile + " e " + categoryFiles[cosItem].file)
+                if (categoryFiles[cosItem].file == headFile) {
+                    head.traverse(function (node) {
+                        if (node.name !== "Scene" && node.material !== undefined) {
+                            if (categoryFiles[cosItem].materials.indexOf("default_secondary_color") !== -1) {
+                                if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color")) {
+                                    node.material.color.set(secColor);
+                                }
+                            }
+                            if (categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor") !== -1) {
+                                if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {
+                                    node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);
+                                }
+                            }
+                            x++;
+                        }
+
+                    })
+                }
+            }
         }
     }
     renderer.render(scene, camera);
@@ -431,46 +485,27 @@ async function SetColors() {
             playerFaceWear = responseBody.active_customizations.items["head/glasses"];
             if (playerCheckpoint == 'checkpoint_lifebuoyflag_basic') playerCheckpoint = 'checkpoint_lifebuoy_flag_basic'//file name stuff so had to add Underscore
             if (playerCheckpoint !== undefined) {
-                OffsetX = 0.5;
-                OffsetY = -1.25
-                OffsetScale = 0.75;
-                OffsetZ = -0.5;
-                cosmeticsOnLoad(playerCheckpoint.replace("checkpoint_", "cosmetics/checkpoint/") + ".glb", undefined/*offsetrotx*/, undefined/*OffsetRoty*/, undefined/*OffsetRotz*/, OffsetScale/*OffsetScale*/, OffsetX/*OffsetX*/, OffsetY/*OffsetY*/, OffsetZ/*OffsetZ*/, 'Checkpoints')
+                cosmeticsOnLoad(playerCheckpoint.replace("checkpoint_", "cosmetics/checkpoint/") + ".glb", 'Checkpoints')
                 if (!toggledElements.includes(playerCheckpoint.replace("checkpoint_", "cosmetics/checkpoint/") + ".glb")) {
                     toggledElements.push(playerCheckpoint.replace("checkpoint_", "cosmetics/checkpoint/") + ".glb");
                 }
             }
             if (playerGrapple !== undefined) {
-                OffsetZ = -0.5;
-                OffsetY = -1.00;
-                OffsetX = -0.5;
-
-                OffsetRotx = Math.PI / 2;
-                OffsetRotz = Math.PI * 4 / 2;
-                cosmeticsOnLoad(playerGrapple.replace("grapple_hook_", "cosmetics/grapple/hook/") + ".glb", OffsetRotx/*offsetrotx*/, undefined/*OffsetRoty*/, OffsetRotz/*OffsetRotz*/, undefined/*OffsetScale*/, OffsetX/*OffsetX*/, OffsetY/*OffsetY*/, OffsetZ/*OffsetZ*/, 'Grapples')
+                cosmeticsOnLoad(playerGrapple.replace("grapple_hook_", "cosmetics/grapple/hook/") + ".glb",'Grapples')
                 if (!toggledElements.includes(playerGrapple.replace("grapple_hook_", "cosmetics/grapple/") + ".glb")) {
                     toggledElements.push(playerGrapple.replace("grapple_hook_", "cosmetics/grapple/") + ".glb");
                 }
             }
             if (playerHat !== undefined) {
-                OffsetY = player_model.children[0].position.y + 0.20;
-                OffsetRoty = 3.0;
-
-                cosmeticsOnLoad(playerHat.replace('head_hat_', 'cosmetics/head/hat/'), undefined, OffsetRoty, undefined, undefined, undefined, OffsetY, undefined, 'Hats')
+                cosmeticsOnLoad(playerHat.replace('head_hat_', 'cosmetics/head/hat/'),'Hats')
                 if (!toggledElements.includes(playerHat.replace("head_", "cosmetics/head/hat/") + ".glb")) {
                     toggledElements.push(playerHat.replace("head_", "cosmetics/head/hat/") + ".glb");
                 }
             }
             if (playerFaceWear !== undefined) {
-                OffsetY = player_model.children[0].position.y + 0.2;
-                if (playerFaceWear == 'cosmetics/head/glasses/glasses_nerd') {
-                    OffsetZ = player_model.children[0].position.z + 0.035;
-                    cosmeticsOnLoad(playerFaceWear.replace("head_glasses_", "cosmetics/head/glasses/") + ".glb", undefined/*offsetrotx*/, undefined/*OffsetRoty*/, undefined/*OffsetRotz*/, undefined/*OffsetScale*/, -undefined/*OffsetX*/, OffsetY/*OffsetY*/, OffsetZ/*OffsetRotz*/, 'Facewear')
-
-                } else {
-                    cosmeticsOnLoad(playerFaceWear.replace("head_glasses_", "cosmetics/head/glasses/") + ".glb", undefined/*offsetrotx*/, undefined/*OffsetRoty*/, undefined/*OffsetRotz*/, undefined/*OffsetScale*/, -undefined/*OffsetX*/, OffsetY/*OffsetY*/, undefined/*OffsetRotz*/, 'Facewear')
-
-                }
+            
+               
+                    cosmeticsOnLoad(playerFaceWear.replace("head_glasses_", "cosmetics/head/glasses/") + ".glb",'Facewear')
 
                 if (!toggledElements.includes(playerFaceWear.replace("head_", "cosmetics/head/glasses/") + ".glb")) {
                     toggledElements.push(playerFaceWear.replace("head_", "cosmetics/head/glasses/") + ".glb");
@@ -479,32 +514,27 @@ async function SetColors() {
             if (playerHead !== undefined) {
                 OffsetY = player_model.children[0].position.y + 0.2;
                 OffsetRoty = Math.PI * 2 / 2;
-                cosmeticsOnLoad(playerHead.replace("head_", "cosmetics/head/head/") + ".glb", undefined/*offsetrotx*/, OffsetRoty/*OffsetRoty*/, undefined/*OffsetRotz*/, undefined/*OffsetScale*/, -undefined/*OffsetX*/, OffsetY/*OffsetY*/, undefined/*OffsetRotz*/, 'Heads')
+                cosmeticsOnLoad(playerHead.replace("head_", "cosmetics/head/head/") + ".glb", 'Heads')
                 if (!toggledElements.includes(playerHead.replace("head_", "cosmetics/head/head/") + ".glb")) {
                     toggledElements.push(playerHead.replace("head_", "cosmetics/head/head/") + ".glb");
                 }
             }
-            function cosmeticsOnLoad(modelFile, OffsetRotx, OffsetRoty, OffsetRotz, OffsetScale, OffsetX, OffsetY, OffsetZ, modelCat) {
+            function cosmeticsOnLoad(modelFile, modelCat) {
                 if (!modelFile.includes(".glb")) {
                     modelFile = modelFile + '.glb';
                 }
                 loader.load(modelFile.replace(/(_primary).*$/i, ".glb"), (model) => {
-                    if (OffsetX) model.scene.position.x = OffsetX;
-                    if (OffsetY) model.scene.position.y = OffsetY;
-                    if (OffsetScale) model.scene.scale.set(OffsetScale, OffsetScale, OffsetScale);
-                    if (OffsetZ) model.scene.position.z = OffsetZ;
-                    if (OffsetRoty) model.scene.rotation.y = OffsetRoty;
-                    if (OffsetRotx) model.scene.rotation.x = OffsetRotx;
-                    if (OffsetRotz) model.scene.rotation.z = OffsetRotz;
-
                     let categoryFiles = files[modelCat]
                     for (var cosItem in categoryFiles) {
                         if (categoryFiles[cosItem].file == modelFile) {
                             let x = 0;
-                           
+                            console.log(files[modelCat][cosItem],cosItem);
+                          model.scene.rotation.x= THREE.MathUtils.degToRad(files[modelCat][cosItem].previewRotation[1])
+                          model.scene.rotation.y = THREE.MathUtils.degToRad(files[modelCat][cosItem].previewRotation[0]);
+                          model.scene.rotation.z = THREE.MathUtils.degToRad(files[modelCat][cosItem].previewRotation[2])
                             model.scene.traverse(function (node) {
                                 if (node.name !== 'Scene') {
-                                    if (categoryFiles[cosItem].materials.indexOf("default_primary_color") !== -1 &&categoryFiles[cosItem].primaryColor==undefined) {
+                                    if (categoryFiles[cosItem].materials.indexOf("default_primary_color") !== -1 && categoryFiles[cosItem].primaryColor == undefined) {
                                         if (x == categoryFiles[cosItem].materials.indexOf("default_primary_color")) {
                                             node.material.color.set(primColor);
                                             console.log(x);
@@ -516,36 +546,36 @@ async function SetColors() {
                                         }
                                     }
                                     if (categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor") !== -1) {
-                                        if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {                            
+                                        if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {
                                             node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);
-                                            player_model.children[0].visible=false;
+                                            player_model.children[0].visible = false;
+                                            headFile = modelFile;
+                                        }
+                                    }
+                                    if (categoryFiles[cosItem].materials.indexOf("default_primary_color") == -1 && categoryFiles[cosItem].primaryColor) {
+                                        if (x == 0) {
+                                            node.material.color.set(`#${Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                                        }
+                                    }
+                                    if (categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 && categoryFiles[cosItem].secondaryColor) {
+                                        if (x == 1) {
+                                            node.material.color.set(`#${Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                                        }
+                                    }
 
-                                        }
-                                    }
-                                    if(categoryFiles[cosItem].materials.indexOf("default_primary_color") == -1 &&categoryFiles[cosItem].primaryColor){
-                                        if(x==0){
-                                            node.material.color.set(`#${ Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
-                                        }
-                                    }
-                                    if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secondaryColor){
-                                        if(x==1){
-                                         node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
-                                     }
-                                 }
-                                    
                                     x++;
                                 }
 
 
-                               
-                            }); 
+
+                            });
                             if (!toggledElements.includes(modelFile)) {
-                                    toggledElements.push(modelFile);
-                                }
+                                toggledElements.push(modelFile);
+                            }
                         }
                     }
 
-                   
+
                     model.scene.name = modelFile;
                     scene.add(model.scene)
                 });
@@ -698,47 +728,49 @@ function createCosmetics(selectedCategory) {
                         model.position.z = 0.035;
                     }
 
-                 if (selectedCategory === "Hands") {
+                    if (selectedCategory === "Hands") {
                         const clonedModel = model.clone();
                         clonedModel.name = model.name;
                         clonedModel.position.x = -model.position.x;
                         scene.add(clonedModel)
                     }
                     let x = 0;
-                   console.log(x);
+                    console.log(x);
                     model.traverse(function (node) {
                         console.log(node.name);
-                        
+
                         if (node.name !== 'Scene') {
-                            if (categoryFiles[cosItem].materials.indexOf("default_primary_color") !== -1 &&categoryFiles[cosItem].primaryColor==undefined) {
-                                if (x == 1+categoryFiles[cosItem].materials.indexOf("default_primary_color")) {
+                            if (categoryFiles[cosItem].materials.indexOf("default_primary_color") !== -1 && categoryFiles[cosItem].primaryColor == undefined) {
+                                if (x == 1 + categoryFiles[cosItem].materials.indexOf("default_primary_color")) {
                                     node.material.color.set(primColor);
                                     console.log(x);
                                 }
                             }
                             if (categoryFiles[cosItem].materials.indexOf("default_secondary_color") !== -1) {
-                                if (x == 1+categoryFiles[cosItem].materials.indexOf("default_secondary_color")) {
+                                if (x == 1 + categoryFiles[cosItem].materials.indexOf("default_secondary_color")) {
                                     node.material.color.set(secColor);
                                 }
                             }
                             if (categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor") !== -1) {
-                                if (x == 1+categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {                            
-                                    if(playerSec_Color){
-                                    node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);
-                                     } player_model.children[0].visible=false;
-    
+                                if (x == 1 + categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {
+                                    if (playerSec_Color) {
+                                        node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);
+                                    } player_model.children[0].visible = false;
+                                    head = model;
+                                    headFile = categoryFiles[cosItem].file;
                                 }
                             }
-                            if(categoryFiles[cosItem].materials.indexOf("default_primary_color") == -1 &&categoryFiles[cosItem].primaryColor){
-                                if(x==1){
-                                    node.material.color.set(`#${ Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                            if (categoryFiles[cosItem].materials.indexOf("default_primary_color") == -1 && categoryFiles[cosItem].primaryColor) {
+                                if (x == 1) {
+                                    node.material.color.set(`#${Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
                                 }
                             }
-                            if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secondaryColor){
-                               if(x==2){
-                                node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
-                            }}
-                            
+                            if (categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 && categoryFiles[cosItem].secondaryColor) {
+                                if (x == 2) {
+                                    node.material.color.set(`#${Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                                }
+                            }
+
                             x++;
                         } scene.add(model);
                     });
@@ -764,7 +796,7 @@ function createCosmetics(selectedCategory) {
                 console.log("raggshkda");
                 console.log(allUntoggled);
                 if (allUntoggled) {
-                   // player_model.children[0].visible = true;
+                    // player_model.children[0].visible = true;
                 }
             }
 
@@ -823,10 +855,10 @@ function createCosmetics(selectedCategory) {
                     gltf.scene.scale.set(2, 2, 2);
                 }
                 let x = 0;
-            
+
                 gltf.scene.traverse(function (node) {
                     if (node.name !== 'Scene') {
-                        if (categoryFiles[cosItem].materials.indexOf("default_primary_color") !== -1 &&categoryFiles[cosItem].primaryColor==undefined) {
+                        if (categoryFiles[cosItem].materials.indexOf("default_primary_color") !== -1 && categoryFiles[cosItem].primaryColor == undefined) {
                             if (x == categoryFiles[cosItem].materials.indexOf("default_primary_color")) {
                                 node.material.color.set(primColor);
                                 console.log(x);
@@ -838,27 +870,27 @@ function createCosmetics(selectedCategory) {
                             }
                         }
                         if (categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor") !== -1) {
-                            if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {  
-                                if(playerSec_Color){
-                                node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);    
-                            }
+                            if (x == categoryFiles[cosItem].materials.indexOf("default_secondary_color_visor")) {
+                                if (playerSec_Color) {
+                                    node.material.color.set(`#${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).r * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).g * 255 / 2)).toString(16).padStart(2, '0')}${parseInt(Math.floor(LinearToGamma({ r: playerSec_Color[0], g: playerSec_Color[1], b: playerSec_Color[2], a: 1 }).b * 255 / 2)).toString(16).padStart(2, '0')}`);
+                                }
 
                             }
                         }
-                        if(categoryFiles[cosItem].materials.indexOf("default_primary_color") == -1 &&categoryFiles[cosItem].primaryColor){
-                            if(x==0){
-                               // categoryFiles[cosItem].primaryColor[0]
-                                node.material.color.set(`#${ Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                        if (categoryFiles[cosItem].materials.indexOf("default_primary_color") == -1 && categoryFiles[cosItem].primaryColor) {
+                            if (x == 0) {
+                                // categoryFiles[cosItem].primaryColor[0]
+                                node.material.color.set(`#${Math.round(categoryFiles[cosItem].primaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[1] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].primaryColor[2] * 255).toString(16).padStart(2, '0')}`)
                             }
                         }
-                        if(categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 &&categoryFiles[cosItem].secondaryColor){
-                            if(x==1){
-                             node.material.color.set(`#${ Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${ Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
-                         }
-                     }            
+                        if (categoryFiles[cosItem].materials.indexOf("default_secondary_color") == -1 && categoryFiles[cosItem].secondaryColor) {
+                            if (x == 1) {
+                                node.material.color.set(`#${Math.round(categoryFiles[cosItem].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${Math.round(categoryFiles[cosItem].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
+                            }
+                        }
                         x++;
                     }
-            
+
                 });
 
                 scene1.add(gltf.scene);

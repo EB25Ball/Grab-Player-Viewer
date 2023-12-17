@@ -1,7 +1,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@v0.132.0';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@v0.132.0/examples/jsm/controls/OrbitControls.js';
 import { SGMLoader } from './sgmLoader.js'
-
+import {DDSLoader} from 'https://cdn.skypack.dev/three@v0.132.0/examples/jsm/loaders/DDSLoader.js'
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('user_id');
 const playerInfo_Url = `https://api.slin.dev/grab/v1/get_user_info?user_id=${userId}`;
@@ -133,6 +133,7 @@ for (var category in catalogResponseBody) {
                 primaryColor: items[cosmeticItem].colors ? items[cosmeticItem].colors[0] : undefined,
                 secondaryColor: items[cosmeticItem].colors ? (items[cosmeticItem].colors[1] ? items[cosmeticItem].colors[1] : undefined) : undefined,
                 materials: materialList,
+                type:items[cosmeticItem].type,
                 previewRotation: preview_rotation,
                 attachment_points: items[cosmeticItem].attachment_points ? items[cosmeticItem].attachment_points : undefined,
               }
@@ -161,6 +162,7 @@ for (var category in catalogResponseBody) {
               primaryColor: items[cosmeticItem].colors ? items[cosmeticItem].colors[0] : undefined,
               secondaryColor: items[cosmeticItem].colors ? (items[cosmeticItem].colors[1] ? items[cosmeticItem].colors[1] : undefined) : undefined,
               materials: materialList,
+              type:items[cosmeticItem].type,
               previewRotation: preview_rotation,
               attachment_points: items[cosmeticItem].attachment_points ? items[cosmeticItem].attachment_points : undefined,
             }
@@ -188,8 +190,6 @@ for (let w = 0; w < 100; w++) {
       playerPrim_Color = e.target.style.backgroundColor;
       changeMeshColors(e.target.style.backgroundColor, undefined, undefined);
       primaryOpened = false;
-      console.log('bruh')
-
     }
     if (secondaryOpened == true) {
       if (selectedSecondaryDiv) selectedSecondaryDiv[0].style.outline = 'none';
@@ -234,7 +234,7 @@ files['player_basic_body'] = {
 renderPlayer('player_basic_head', 'Heads');
 renderPlayer('player_basic_body', undefined);
 function displayCategoryList(a) {
-  let categoriesContent = document.getElementById('categories-content'); // replace 'parent' with your parent element's id
+  let categoriesContent = document.getElementById('categories-content'); 
   let children = categoriesContent.children;
   if (a == 0) {//front page
     backTracker=0;
@@ -266,6 +266,8 @@ function displayCategoryList(a) {
     document.getElementById('Checkpoints').style.display = 'block'
     document.getElementById('back-btn').style.display = 'block'
     document.getElementById('categories-content').style.height = '300px'
+    document.getElementById('content').style.height='';
+    document.getElementById('back-btn').style.marginTop='0em';
 
   }
 
@@ -300,7 +302,10 @@ function displayCategoryList(a) {
     for (let i = 0; i < children.length; i++) {
       children[i].style.display = 'none';
     }
+    document.getElementById('content').style.height='100%';
     document.getElementById('categories-content').style.height = '372px'
+    document.getElementById('back-btn').style.marginTop='1.5em';
+
     //categories will dissappear btw
   }
 
@@ -332,7 +337,6 @@ addEventListener('click', (e) => {
     animates();
   }
   if(e.target.id=='back-btn'){
-    console.log('rahhh', backTracker)
     displayCategoryList(backTracker);
   }
 
@@ -347,7 +351,7 @@ directionalLight.position.set(0, 1, 2);
 scene.add(directionalLight);
 
 const camera = new THREE.PerspectiveCamera(55, 400 / 450, 1, 1000);
-camera.position.z = 2.5;
+camera.position.z = 3.5;
 camera.rotation.x = -0.1;
 
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('.player-model'), alpha: true, transparent: true, antialias: true });
@@ -422,19 +426,17 @@ function renderPlayer(file, category) {
       activeCosmetics['Heads'] = 'player_basic_head'
     }
     const loader = new SGMLoader();
-    console.log(file, category);
-    loader.load(files[file].file, function ([meshes, materials]) {
-
+    loader.load(files[file].file, function ([meshes, materials]) { 
       const group = new THREE.Group();
 
       const threeMaterials = materials.map((material) => {
         const color = material.colors[0][0];
-
-        return new THREE.MeshStandardMaterial({
+        const matOptions = {
           color: new THREE.Color(color[0], color[1], color[2]),
-        });
+        };
+        //we need some way to render the textures in cosmetics/textures
+        return new THREE.MeshStandardMaterial(matOptions);
       });
-
 
       meshes.forEach((mesh) => {
         const geometry = new THREE.BufferGeometry();
@@ -451,8 +453,8 @@ function renderPlayer(file, category) {
         });
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
         geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-
         geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        
         geometry.setIndex(new THREE.Uint32BufferAttribute(mesh.indices, 1));
 
         const threeMesh = new THREE.Mesh(geometry, threeMaterials[mesh.material_id]);
@@ -460,11 +462,6 @@ function renderPlayer(file, category) {
       });
 
       if (file) {
-        if (files[file].previewRotation !== undefined) {
-          group.rotation.x = Number(files[file].previewRotation[1]) * Math.PI / 180;
-          group.rotation.y = Number(files[file].previewRotation[2]) * Math.PI / 180;
-          group.rotation.z = Number(files[file].previewRotation[1]) * Math.PI / 180;
-        }
         group.name = files[file].name;
         if (category !== undefined) {
           if (['Heads', 'Hats', 'Facewear'].includes(category)) {
@@ -489,14 +486,16 @@ function renderPlayer(file, category) {
             }
           }
           if ('Grapples' === category) {
-            group.position.x = -0.5;
-            group.position.y = -1.25
-            group.rotation.z += Math.PI / 2;
-            group.rotation.x += Math.PI;
-          }
-          if ('Checkpoints' === category) {
             group.position.x = 0.5;
+            group.position.y = -1.25
+            group.rotation.x += Math.PI/2;
+            group.rotation.y += Math.PI
+          }
+   
+          if ('Checkpoints' === category) {
+            group.position.x = -0.5;
             group.position.y = -1.5
+            group.rotation.y += Math.PI
           }
 
         }
@@ -559,10 +558,9 @@ async function renderCosmetics(category) {
       previewButton.style.width = '70%';
 
       previewButton.innerHTML = 'preview';
-      previewButton.style.zIndex = 4388889;
+      previewButton.style.zIndex = 999;
       previewButton.classList.add('previewButton', `${category}`);
       previewButton.id = item;
-      console.log(itemBackup, category);
       if (item === activeCosmetics[category]) {
         if(!previewButton.classList.contains('toggled')){
         previewButton.classList.toggle('toggled');
@@ -636,18 +634,17 @@ async function renderCosmetics(category) {
 
           if (z) {
             if (files[z].previewRotation !== undefined) {
-              group.rotation.x += Number(files[z].previewRotation[2]) * Math.PI / 180;
-              group.rotation.y += Number(files[z].previewRotation[0]) * Math.PI / 180;
-              group.rotation.z += Number(files[z].previewRotation[1]) * Math.PI / 180;
+              group.rotation.x += Number(files[z].previewRotation[0]) * Math.PI / 180;
+              group.rotation.y += Number(files[z].previewRotation[1]) * Math.PI / 180;
+              group.rotation.z += Number(files[z].previewRotation[2]) * Math.PI / 180;
             }
             group.name = files[z].name;
             if (files[z].category == 'Grapples') {
-              group.rotation.z -= Math.PI / 2;
-              group.rotation.x += Math.PI / 2;
+              group.rotation.x += Math.PI/2;
+              group.rotation.y -= Math.PI/2 ;
             }
             if (files[z].materials.indexOf('default_primary_color') !== -1) {
               group.children[files[z].materials.indexOf('default_primary_color')].name = 'default_primary_color'
-              console.log(group.children, group.name, 'item ' + z, 'filename and stuff ' + files[z].name, 'hi' + files[z].materials.indexOf('default_primary_color'))
             }
             if (files[z].materials.indexOf('default_secondary_color') !== -1) {
               group.children[files[z].materials.indexOf('default_secondary_color')].name = 'default_secondary_color'
@@ -661,8 +658,6 @@ async function renderCosmetics(category) {
             if (files[z].materials.indexOf("default_primary_color") == -1 && files[z].primaryColor) {
               group.children[1].material.color.set(`#${Math.round(files[z].secondaryColor[0] * 255).toString(16).padStart(2, '0')}${Math.round(files[z].secondaryColor[1] * 255).toString(16).padStart(2, '0')}${Math.round(files[z].secondaryColor[2] * 255).toString(16).padStart(2, '0')}`)
             }
-          } else {
-            console.log('bruhj')
           }
           group.children.forEach((e) => {
             if (e.name === 'default_primary_color' && playerPrim_Color !== undefined) {
@@ -730,7 +725,6 @@ function render() {
 function changeMeshColors(primaryColor, secondaryColor, visorColor_) {
   scene.traverse((child) => {
     if (child instanceof THREE.Group) {
-      console.log(child)
       child.children.forEach((e) => {
         if (e.name === 'default_primary_color' && primaryColor !== undefined) {
           e.material.color.set(primaryColor);

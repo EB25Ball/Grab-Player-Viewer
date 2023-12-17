@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:type" content="website">
-	<meta property="og:url" content="https://eb25ball.github.io/Grab-Player-Viewer/">
-	<meta property="og:title" content="Grab Player Viewer">
-	<meta property="og:description" content="edit player from grab">
-	<meta property="og:image" content="https://eb25ball.github.io/Grab-Player-Viewer/thumbnail.png">
+    <meta property="og:url" content="https://eb25ball.github.io/Grab-Player-Viewer/">
+    <meta property="og:title" content="Grab Player Viewer">
+    <meta property="og:description" content="edit player from grab">
+    <meta property="og:image" content="https://eb25ball.github.io/Grab-Player-Viewer/thumbnail.png">
     <link rel="preload" type="text/css" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" />
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     <title>Player Customiser</title>
@@ -16,7 +16,8 @@
         <div class="description">Scene $</div>
         <div class="scene"></div>
     </script>
-    <script type="module" src="player.js" defer></script>
+    <script type="module" src="app.js" defer></script>
+
     <style>
         body {
             font-family: 'Roboto';
@@ -37,13 +38,15 @@
         }
 
         #customizations {
-            grid-template-columns: repeat(10, 5fr);
             width: 572px;
-            height: 399px;
+            height: 100%;
             overflow-y: scroll;
             overflow-x: hidden;
             padding: 3px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
 
         }
 
@@ -57,11 +60,11 @@
             border: none;
             position: relative;
             cursor: pointer;
+            z-index: 9999999;
         }
 
-        #color-picker {
+        #categories-content {
             display: grid;
-            grid-template-columns: repeat(10, 5fr);
             overflow: hidden;
             width: 372px;
             z-index: 2;
@@ -71,35 +74,35 @@
 
         }
 
-        #color-picker div,
-        #color-picker div.selected:has(~ div:active),
-        div.selected:is(#color-picker div:active ~ div.selected) {
+        #categories-content div,
+        #categories-content div.selected:has(~ div:active),
+        div.selected:is(#categories-content div:active ~ div.selected) {
             width: 30px;
             height: 30px;
             display: inline-block;
             outline: none;
         }
 
-        #color-picker div:hover {
+        #categories-content div:hover {
             cursor: pointer;
             outline: 3px solid #333;
         }
 
-        #color-picker div.selected,
-        #color-picker div:active {
+        #categories-content div.selected,
+        #categories-content div:active {
             outline: 3px solid #000;
         }
 
-        #color-picker span {
+        #categories-content span {
             color: #0f6db3;
             font-size: 1.5em;
             cursor: pointer;
             text-align: center;
         }
 
-        #color-picker div {
+        #categories-content div {
             display: none;
-            margin: 10%;
+            margin: 1%;
         }
 
         .player-model {
@@ -144,10 +147,9 @@
             color: #0f6db3;
             font-size: 1.5em;
             cursor: pointer;
-            position: absolute;
+            position: relative;
+            width: fit-content;
         }
-
-     
 
         #canvas {
             position: fixed;
@@ -176,22 +178,31 @@
             font-family: sans-serif;
             font-size: large;
             width: 200px;
+            height: 20px;
             margin-top: 0.5em;
             bottom: 75%;
         }
     </style>
 </head>
 
-<body id="body">
+<body id="body1">
     <canvas class="player-model"></canvas> <canvas id="canvas"></canvas>
     <div id="customizations">
-        <div id="color-picker">
+        <span id="back-btn" style="display: none;">Back</span>
+
+        <div id="categories-content">
             <span id="cosmetics">Cosmetics</span>
             <span id="primary">Change Main Color</span>
             <span id="secondary">Change Second Color</span>
-
+            <span id="Head" style="display: none;">Head</span>
+            <span class="final" id="Body" style="display: none;">Body</span>
+            <span class="final" id="Hands" style="display: none;">Hands</span>
+            <span class="final" id="Grapples" style="display: none;">Grapples</span>
+            <span class="final" id="Checkpoints" style="display: none;">Checkpoints</span>
+            <span class="final" id="Heads" style="display: none;">Head</span>
+            <span class="final" id="Hats" style="display: none;">Hats</span>
+            <span class="final" id="Facewear" style="display: none;">Hands</span>
         </div>
-        <span id="back-btn" style="display: none;">Back</span>
         <div id="content"></div>
 
     </div>

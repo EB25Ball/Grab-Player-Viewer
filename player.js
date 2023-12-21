@@ -1,6 +1,9 @@
-import * as THREE from 'https://cdn.skypack.dev/three@v0.132.0';
-import { OrbitControls } from 'https://cdn.skypack.dev/three@v0.132.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SGMLoader } from './sgmLoader.js'
+
+( async () => {
+
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('user_id');
 const playerInfo_Url = `https://api.slin.dev/grab/v1/get_user_info?user_id=${userId}`;
@@ -220,30 +223,29 @@ for (let w = 0; w < 100; w++) {
   container.style.backgroundColor = `rgb(${Math.floor(LinearToGamma(GetColor(firstWholeDigitNum, lastWholeDigitNum)).r * 255)}, ${Math.floor(LinearToGamma(GetColor(firstWholeDigitNum, lastWholeDigitNum)).g * 255)}, ${Math.floor(LinearToGamma(GetColor(firstWholeDigitNum, lastWholeDigitNum)).b * 255)})`;
   picker.appendChild(container);
 }
-files['player_basic_head'] = {
-  file: './playerModel/head.sgm',
+files['default'] = {
+  file: './cosmetics/head/head/head.sgm',
   name: 'Head Basic',
   category: 'Heads',
   materials: ['default_primary_color', 'default_secondary_color', 'default_secondary_color_visor'],
-  previewRotation: [180, 0, 0]
+  previewRotation: [180, 0, 0],
+  attachment_points:{glasses:{position:[0,0,0]}}//really weird condition 
 }
 files['player_basic_body'] = {
-  file: './playerModel/body.sgm',
+  file: './cosmetics/body/body.sgm',
   name: 'Body Basic',
   category: undefined,
   materials: ['default_secondary_color', 'default_primary_color']
 
 }
 files['player_basic_hand'] = {
-  file: './playerModel/hand_claw.sgm',
+  file: './cosmetics/hand/hand_claw.sgm',
   name: 'Claw Hand',
   category: 'Hands',
   materials: ['default_primary_color', 'default_secondary_color', 'default_secondary_color_visor'],
   previewRotation: [180, 0, 0]
 }
-renderPlayer('player_basic_head', 'Heads');
-renderPlayer('player_basic_hand', 'Hands');
-renderPlayer('player_basic_body', undefined);
+ 
 let categoryState;
 function displayCategoryList(a) {
   let categoriesContent = document.getElementById('categories-content');
@@ -370,7 +372,7 @@ const scene = new THREE.Scene();
 scene.background = null
 
 scene.add(new THREE.AmbientLight(0xffffff, 1));
-const directionalLight = new THREE.DirectionalLight(0x999999, 0.5)
+const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 2)
 directionalLight.position.set(0, 1, 2);
 scene.add(directionalLight);
 
@@ -387,7 +389,9 @@ controls.enableZoom = controls.enablePan = true;
 controls.minPolarAngle = controls.maxPolarAngle = Math.PI / 2;
 controls.addEventListener('start', () => document.body.style.cursor = 'none');
 controls.addEventListener('end', () => document.body.style.cursor = 'auto');
-
+await renderPlayer('default', 'Heads');
+await renderPlayer('player_basic_hand', 'Hands');
+await renderPlayer('player_basic_body', undefined);
 if (userId) {
   let playerInfoResponse = await fetch(playerInfo_Url);
   let playerResponseBody = await playerInfoResponse.json();
@@ -403,14 +407,14 @@ if (userId) {
 
   if (activeCosmetics['Heads'] !== undefined && playerResponseBody.active_customizations.items["head"] !== undefined && activeCosmetics['Heads'] !== playerResponseBody.active_customizations.items["head"]) {
     scene.remove(scene.getObjectByName(files[activeCosmetics['Heads']].name));
-  } activeCosmetics['Heads'] = playerResponseBody.active_customizations.items["head"] ? playerResponseBody.active_customizations.items["head"] : 'player_basic_head'
+  } activeCosmetics['Heads'] = playerResponseBody.active_customizations.items["head"] ? playerResponseBody.active_customizations.items["head"] : 'default'
   if (activeCosmetics['Hands'] !== undefined && playerResponseBody.active_customizations.items["hand"] !== undefined && activeCosmetics['Hands'] !== playerResponseBody.active_customizations.items["hand"]) {
     scene.remove(scene.getObjectByName(files[activeCosmetics['Hands']].name));
     if (clonedGroup) {
       scene.remove(clonedGroup);
     }
   } activeCosmetics['Hands'] = playerResponseBody.active_customizations.items["hand"] ? playerResponseBody.active_customizations.items["hand"] : 'player_basic_hand'
- 
+
   if (activeCosmetics['Grapples'] !== undefined && activeCosmetics['Grapples'] !== playerResponseBody.active_customizations.items["grapple/hook"]) {
     scene.remove(scene.getObjectByName(files[activeCosmetics['Grapples']].name));
 
@@ -424,7 +428,7 @@ if (userId) {
     scene.remove(scene.getObjectByName(files[activeCosmetics['Body']].name));
   } activeCosmetics['Body'] = playerResponseBody.active_customizations.items["body/neck"]
 
-  
+
 
   let renderPromises = []
   if (playerResponseBody.active_customizations.items["head/glasses"] !== undefined) {
@@ -446,7 +450,7 @@ if (userId) {
   if (playerResponseBody.active_customizations.items["head"] !== undefined) {
     renderPromises.push(renderPlayer(playerResponseBody.active_customizations.items["head"], 'Heads'));
   }
-  
+
   if (playerResponseBody.active_customizations.items["body/neck"] !== undefined) {
     renderPromises.push(renderPlayer(playerResponseBody.active_customizations.items["body/neck"], 'Body'));
   }
@@ -458,23 +462,22 @@ if (userId) {
 
 function renderPlayer(file, category) {
   return new Promise((resolve, reject) => {
-    if (file === 'player_basic_head') {
-      activeCosmetics['Heads'] = 'player_basic_head'
+    if (file === 'default') {
+      activeCosmetics['Heads'] = 'default';
     }
     if (file === 'player_basic_hand') {
-      activeCosmetics['Hands'] = 'player_basic_hand'
+      activeCosmetics['Hands'] = 'player_basic_hand';
     }
 
     const loader = new SGMLoader();
-    loader.load(files[file].file, function ([meshes, materials]) {
+    loader.load(files[file].file, async function ([meshes, materials]) {
+      console.log(meshes, materials);
       const group = new THREE.Group();
-
       const threeMaterials = materials.map((material) => {
         const color = material.colors[0][0];
         const matOptions = {
           color: new THREE.Color(color[0], color[1], color[2]),
         };
-        //we need some way to render the textures in cosmetics/textures
         return new THREE.MeshStandardMaterial(matOptions);
       });
 
@@ -501,7 +504,6 @@ function renderPlayer(file, category) {
         group.add(threeMesh);
       });
 
-
       group.name = files[file].name;
 
       if (category !== undefined) {
@@ -511,8 +513,8 @@ function renderPlayer(file, category) {
         if ('Heads' === category) {
           if (activeCosmetics['Facewear'] !== undefined) {
             let referenceGroup = scene.getObjectByName(files[activeCosmetics['Facewear']].name)
-            referenceGroup.position.set(0,0.2,0);
-            if (files[file].attachment_points!==undefined&&files[file].attachment_points.glasses !== undefined) {
+            referenceGroup.position.set(0, 0.2, 0);
+            if (files[file].attachment_points !== undefined && files[file].attachment_points.glasses !== undefined) {
               if (files[file].attachment_points.glasses.scale !== undefined) {
                 referenceGroup.scale.set(files[file].attachment_points.glasses.scale, files[file].attachment_points.glasses.scale, files[file].attachment_points.glasses.scale)
               }
@@ -526,14 +528,14 @@ function renderPlayer(file, category) {
           }
           if (activeCosmetics['Hats'] !== undefined) {
             let referenceGroup = scene.getObjectByName(files[activeCosmetics['Hats']].name)
-            referenceGroup.position.set(0,0.2,0);
-            if (files[file].attachment_points!==undefined&&files[file].attachment_points.hat !== undefined) {
+            referenceGroup.position.set(0, 0.2, 0);
+            if (files[file].attachment_points !== undefined && files[file].attachment_points.hat !== undefined) {
               if (files[file].attachment_points.hat.scale !== undefined) {
                 referenceGroup.scale.set(files[file].attachment_points.hat.scale, files[file].attachment_points.hat.scale, files[file].attachment_points.hat.scale)
               }
               referenceGroup.position.y += Number(files[file].attachment_points.hat.position[1]);
             }
-          } 
+          }
         }
         if (files[activeCosmetics['Heads']].attachment_points) {
           if ('Facewear' === category) {
@@ -544,6 +546,8 @@ function renderPlayer(file, category) {
               group.position.z -= Number(files[activeCosmetics['Heads']].attachment_points.glasses.position[2]);
             }
             if (files[file].attachment_point_overrides !== undefined) {
+              console.log(activeCosmetics['Heads'])
+
               group.position.x -= Number(files[file].attachment_point_overrides[activeCosmetics['Heads']].position[0])
               group.position.y += Number(files[file].attachment_point_overrides[activeCosmetics['Heads']].position[1])
               group.position.z -= Number(files[file].attachment_point_overrides[activeCosmetics['Heads']].position[2])
@@ -608,7 +612,6 @@ function renderPlayer(file, category) {
         group.position.set(0.3, -0.75, 0.1);
         group.rotation.x += Math.PI / 2
       }
-
       resolve();
     });
   });
@@ -709,6 +712,7 @@ async function renderCosmetics(category) {
         sgmLoader2.load(files[item].file, function ([meshes, materials]) {
           const group = new THREE.Group();
           const threeMaterials = materials.map((material) => {
+            console.log(material)
             const color = material.colors[0][0];
 
             return new THREE.MeshStandardMaterial({
@@ -740,25 +744,13 @@ async function renderCosmetics(category) {
           });
 
           if (z) {
-            if (files[z].previewRotation !== undefined && files[z].category !== 'Hats') {
-              group.rotation.x += Number(files[z].previewRotation[0]) * Math.PI / 180;//this cant be y
-              group.rotation.y += Number(files[z].previewRotation[1]) * Math.PI / 180;
-              group.rotation.z += Number(files[z].previewRotation[2]) * Math.PI / 180;
+            if (files[z].previewRotation !== undefined) {
+                group.rotation.x += Number(files[z].previewRotation[1]) * Math.PI / 180;//this cant be y. Update: it might be y 
+                group.rotation.y += Number(files[z].previewRotation[0]) * Math.PI / 180;
+                group.rotation.z += Number(files[z].previewRotation[2]) * Math.PI / 180;
+                //Three js and grab rotations axis I still dont know the conversion so this might be wrong           
             }
             group.name = files[z].name;
-            if (files[z].category == 'Grapples') {
-              group.rotation.x += Math.PI / 2;
-              group.rotation.y -= Math.PI / 2;
-            }
-            if (files[z].category == 'Heads') {
-              group.rotation.z += Math.PI
-            }
-            if (files[z].category == 'Facewear') {
-              group.rotation.z += Math.PI
-            }
-            if (files[z].category == 'Hats') {
-              group.rotation.y += Math.PI
-            }
             if (files[z].category == 'Hands') {
               group.rotation.x += Math.PI / 2
             }
@@ -861,3 +853,4 @@ function changeMeshColors(primaryColor, secondaryColor, visorColor_) {
 }
 
 renderLoop();
+})();

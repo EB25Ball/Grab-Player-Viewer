@@ -19,8 +19,10 @@ let loader = new GLTFLoader();
 let lastRan = '';
 let oldText = '';
 
+//elements
 const editInputElement = document.getElementById('edit-input');
 const terminalInputElement = document.getElementById('terminal-input');
+const renderContainerElement = document.getElementById('render-container');
 
 const editor = ace.edit("edit-input");
 editor.setTheme("ace/theme/my_custom_theme"); 
@@ -67,6 +69,23 @@ function initEditor() {
     });
     camera.position.set(0, 10, 10);
     renderer.setAnimationLoop(animate);
+    renderer.render( scene, camera );
+
+}
+function animate() {
+    let delta = clock.getDelta();
+    delta *= animationSpeed;
+    controls.update(delta);
+    if (playAnimations) {
+        animationTime += delta;
+        timelineSliderElement.value = animationTime % timelineSliderElement.max;
+        for(let object of animatedObjects) {
+            updateObjectAnimation(object, animationTime)
+        }
+    }
+
+	// requestAnimationFrame( animate );
+	renderer.render( scene, camera );
 }
 // function setLevel(level) {
 //     console.log(level);

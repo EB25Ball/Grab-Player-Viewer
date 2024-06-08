@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Editor with Canvas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="menu">
+        <ul class="menu-list">
+            <li>
+                <button class="menu-btn">File</button>
+                <ul class="menu-dropdown">
+                    <li>
+                        <button class="menu-btn" id="upload">Upload Model</button>
+                    </li>
+                    <li>
+                        <button class="menu-btn" id="save-json">Save Json</button>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+        <div class="editor-container">
+            <div class="tabs">
+                <div class="resizer" id="resizer"></div>
+                <button id="tab1" class="tab active">Shop Items</button>
+                <button id="tab2" class="tab">Shop Products</button>
+            </div>
+            <div id="editor" class="editor"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script src="ace_theme.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html prefix="og: http://ogp.me/ns#">
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <title>JSON Level Editor | Grab Tools | .index | twhlynch</title>
+        <meta name="description" content="Complex .level editor for Grab. Edit levels in JSON, 3D, or run functions to modify it for you. Access unobtainable object types and more.">
+        <meta name="author" content="twhlynch">
+        <meta property="og:title" content="JSON Level Editor | .index | Grab Tools | twhlynch">
+        <meta property="og:description" content="Complex .level editor for Grab. Edit levels in JSON, 3D, or run functions to modify it for you. Access unobtainable object types and more.">
+        <meta property="og:site_name" content=".index JSON Level Editor">
+        <meta property="og:locale" content="en_us">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="http://grab-tools.live/editor">
+        <meta property="og:image" content="http://grab-tools.live/favicon.gif">
+        <link rel="icon" href="favicon.gif" type="image/gif">
+        <link rel="stylesheet" href="styles/editor-styles.css">
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-BDS57RBQ3Q"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-BDS57RBQ3Q');
+        </script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2378042345376266" crossorigin="anonymous"></script>
+        <script src="/js/webadb.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/protobufjs@7.X.X/dist/protobuf.js"></script>
+        <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+                    "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <nav class="menu">
+            <ul class="menu-list">
+                <li>
+                    <button class="menu-btn">File</button>
+                    <ul class="menu-dropdown">
+                        <li>
+                            <button class="menu-btn">New</button>
+                            <ul class="menu-dropdown">
+                                <li>
+                                    <button class="menu-btn" id="empty-btn">Empty</button>
+                                </li>
+                                <li>
+                                    <button class="menu-btn" id="template-btn">Template</button>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="menu-btn">Open</button>
+                            <ul class="menu-dropdown">
+                                <li>
+                                    <button class="menu-btn" id="pc-btn">Level File</button>
+                                    <input type="file" id="pc-btn-input" style="display:none">
+                                </li>
+                                <li>
+                                    <button class="menu-btn" id="pcjson-btn">JSON File</button>
+                                    <input type="file" id="pcjson-btn-input" style="display:none">
+                                </li>
+                                <li>
+                                    <button class="menu-btn" id="quest-btn">From Quest</button>
+                                </li>
+                                <li>
+                                    <button class="menu-btn" id="the-index-btn">The INDEX</button>
+                                </li>
+                                <li>
+                                    <button class="menu-btn" id="all-objects-btn">All V6 Objects</button>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="menu-btn">Save</button>
+                            <ul class="menu-dropdown">
+                                <li>
+                                    <button class="menu-btn" id="topc-btn">To File</button>
+                                </li>
+                                <li>
+                                    <button class="menu-btn" id="toquest-btn">To Quest</button>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <button class="menu-btn">Export</button>
+                            <ul class="menu-dropdown">
+                                <li>
+                                    <button class="menu-btn" id="gltf-btn">glTF</button>
+                                </li>
+                                <li>
+                                    <button class="menu-btn" id="json-btn">JSON</button>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div id="content">
+            <div id="render-container">
+
+            </div>
+            <div id="edit-resize">&nbsp;</div>
+            <div id="editing-container">
+                <div id="editor">
+                    <div name="edit-input" id="edit-input" spellcheck="false" contenteditable="true" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false">
+
+
+                        RAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                    </div>
+                </div>
+                <div id="terminal-resize">&nbsp;</div>
+                <div id="terminal">
+                    <textarea name="terminal-input" id="terminal-input" cols="20" rows="10" spellcheck="false" contenteditable="true"></textarea>
+                    <script>
+                        document.getElementById("terminal-input").placeholder = "[Enter] to run JS code in loop\n[Alt] & [Enter] to run JS code out of loop\n[Alt] & [UpArrow] for last ran\nvar level = getLevel()\nlevel.levelNodes.forEach(node => {})";
+                    </script>
+                    <div id="editor-ad-container">
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2378042345376266"
+                                crossorigin="anonymous"></script>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/editor-resize.js"></script>
+        <script type="module" src="js/editor-main.js"></script>
+    </body>
+</html>
